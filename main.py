@@ -1,107 +1,32 @@
+import json
+
 CURRENT_TURN = 0
+DOCTORS_MOVES_COUNT = 2
+ASSISTANTS_MOVES_COUNT = 2
+PLAGUE_MOVES_COUNT = 1
 
-characters = {
-    '0': {
-        'name' : 'Plague',
-        'type' : 'plague',
-        'color' : 'black',
-        'current_possition' : '-1',
-    },
 
-    '-1': {
-        'name' : 'Bachelor',
-        'type' : 'doctor',
-        'color' : 'blue',
-        'current_possition' : '-1',
-        'quarantine' : True,
-        'resources' : {
-            'coin' : 1,
-            'key' : 0,
-            'secret' : 0,
-        },
-        'skills' : [],
-        'skills_in_hand' : [],
-        'skills_played' : [],
-        'assistants' : ('1', '2', '3'),
-        'banned_assistant' : '0', # 0 - no banned assistant
-    },
+def read_json_data(path):
+    ''' Read data from json file
+    Returns
+    -------
+    dict
+        json readed into python dict
+    '''
+    with open(path, 'r') as file:
+        return json.load(file)
 
-    '1': {
-        'name' : 'Junior Vlad',
-        'type' : 'assistant',
-        'color' : 'blue',
-        'current_possition' : '-1',
-        'quarantine' : True,
-        'serves_to' : '-1', # bachelor
-        'banned_by' : '0', # 0 means not banned
-        'donor' : False,
-        'resource': 'secret',
-    },
 
-    '2': {
-        'name' : 'Mary',
-        'type' : 'assistant',
-        'color' : 'blue',
-        'current_possition' : '-1',
-        'quarantine' : True,
-        'serves_to' : '-1', # bachelor
-        'donor' : False,
-        'resource': 'coin',
-    },
+paths = read_json_data('data/paths.json')
 
-    '3': {
-        'name' : 'Andrew',
-        'type' : 'assistant',
-        'color' : 'blue',
-        'current_possition' : '-1',
-        'quarantine' : True,
-        'serves_to' : '-1', # bachelor
-        'donor' : False,
-        'resource': 'key',
-    },
-}
+# TODO: create all characters and fill it with correct data
+characters = read_json_data('data/characters.json')
 
-skills = {
-    '1' : {
-        'name' : '',
-        'doctor' : '-1',
-        'description' : '',
-        'type' : 'reaction',
-    },
+# TODO: create all skills
+skills = read_json_data('data/skills.json')
 
-    '2' : {
-        'name' : '',
-        'doctor' : '-2',
-        'description' : '',
-        'type' : 'reaction',
-    },
-
-    '3' : {
-        'name' : '',
-        'doctor' : '-3',
-        'description' : '',
-        'type' : 'reaction',
-    },
-}
-
-paths = {
-    '0' : [1, 2, 3, 4, 5, 6, 7],
-    '1' : [11, 2, 0],
-    '2' : [1, 3, 0],
-    '3' : [2, 4, 11, 0],
-    '4' : [3, 5, 11, 12, 0],
-    '5' : [4, 12, 0],
-    '6' : [7, 13, 0],
-    '7' : [6, 13, 0],
-    '8' : [13, 14],
-    '9' : [10, 14, 15],
-    '10' : [9, 11, 15],
-    '11' : [1, 3, 4, 10, 12, 15],
-    '12' : [4, 5, 11, 13, 15],
-    '13' : [6, 7, 8, 12, 14],
-    '14' : [8, 9, 13],
-    '15' : [9, 10, 11, 12],
-}
+# TODO: create all strains
+strains = read_json_data('data/strains.json')
 
 game_map = {
     '1' : {
@@ -196,6 +121,24 @@ game_map = {
         },
 }
 
+
+
+def get_doctors():
+    ''' Get all doctors from characters
+
+    Returns
+    -------
+    dict
+        Dictionary like <characters> but with doctors only
+    '''
+    # doc_ids = ['-1', '-2', '-3']
+    doc_ids = ['-1']
+    doctors = {}
+    for doc_id in doc_ids:
+        doctors[doc_id] = characters[doc_id]
+    return doctors
+
+
 def place_character(place, character):
     ''' Places character to possition on the map
 
@@ -210,11 +153,14 @@ def place_character(place, character):
     characters[character]['current_possition'] = place
 
 
-def game_init():
-    '''
-        Initial placement of characters
-        Fills game_map with charactes id
-        and puts current_possition to characters
+def initial_placing():
+    ''' Initial placement of characters
+    Fills <game_map> with charactes id
+    and puts <current_possition> to characters
+    Each player can place any avaliable character 
+    to any avaliable place exept Steepe (0)
+    Turn order: (Bachelor -> Haruspex -> Devotress) X 3 -> Plague
+    Plague can be placed in any empty spot and Steepe (0)
     '''
 
     avaliable_assistants = {
@@ -260,7 +206,7 @@ def game_init():
             avaliable_places.remove(place)
             avaliable_assistants[doctor_name].remove(character)
 
-    avaliable_places.append('0')
+    avaliable_places.append('0') # Plague can start in steepe
     plague_place = ''
     print('\n' + '-' * 21)
     while 1:
@@ -300,30 +246,56 @@ def move_to(character, place):
 
 def move(character):
     '''
-    Shows avaliable moves and asks to input place
-    then moves character
+    Shows avaliable moves and asks to input place then moves character.
     '''
-    current_possition = characters[character]['current_possition']
-    avaliable_moves = paths[current_possition]
 
-    print(f'Avaliable moves: {avaliable_moves}')
-    user_input = ''
-    while 1:
-        user_input = input('Input move: ')
+    moves_count = 0
+    if character in ['-1', '-2', '-3']:
+        moves_count = DOCTORS_MOVES_COUNT
+    elif character == '0':
+        moves_count = PLAGUE_MOVES_COUNT
+    else:
+        moves_count = ASSISTANTS_MOVES_COUNT
 
-        if user_input in avaliable_moves:
+    print(f'Avaliable moves count = {moves_count}')
+    for i in range(moves_count):
+        print(f'Performing move {i}')
+        current_possition = characters[character]['current_possition']
+        avaliable_moves = paths[current_possition]
+        # Remove Steepe from avaliable moves if character not Plague
+        if character != '0' and '0' in avaliable_moves:
+            avaliable_moves.remove('0')
+
+        print(f'Avaliable moves: {avaliable_moves}')
+        print('Write "q" to stop')
+        user_input = ''
+        while 1:
+            user_input = input('Input move: ')
+
+            if user_input in avaliable_moves:
+                break
+            else:
+                print('Cant move here')
+
+        if user_input == 'q':
             break
         else:
-            print('Cant move here')
-
-    move_to(character, user_input)
+            move_to(character, user_input)
 
 
 def pick_skill(character):
+    ''' Pick a skill from avaliable for this character
+
+    Parameters
+    ----------
+    character : str
+        character id
+    '''
     doctors_skills = [x[0] for x in skills.items() if x[1]['doctor'] == character]
     avaliable_skills = [x for x in doctors_skills if x not in characters[character]['skills_played']]
+    doctor_name = characters[character]['name']
 
-    print('Pick a skill')
+    print(f'Pick a skill for {doctor_name}')
     print(f'Avaliable skills: {avaliable_skills}')
 
     user_input = ''
@@ -339,16 +311,38 @@ def pick_skill(character):
     del skills[user_input]
 
 
+def get_strain_from_deck():
+    '''
+    TODO : implement this
+    '''
+    pass
 
-class Plague():
-    name = 'Plague'
-    turn = 0
-    color = 'black'
-    possition = 0
+
+def get_strain_from_discard():
+    '''
+    TODO: implement this
+    '''
+    pass
 
 
-# game_init()
+def game_initiation():
+    '''
+
+    '''
+    initial_placing()
+
+    doctors = get_doctors()
+    for doc_id, doctor in doctors.items():
+        pick_skill(doc_id)
+
+    get_strain_from_deck()
+
+
+game_initiation()
 # move_to('-1','15')
 # print(game_map)
 
-pick_skill('-1')
+# pick_skill('-1')
+# print(characters['-1'])
+
+# move('-1')
