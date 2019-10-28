@@ -1,0 +1,60 @@
+{
+    "0": {
+        "name" : "Plague",
+        "type" : "plague",
+        "color" : "black",
+        "current_possition" : "-1"
+    },
+
+    "-1": {
+        "name" : "Bachelor",
+        "type" : "doctor",
+        "color" : "blue",
+        "current_possition" : "-1",
+        "quarantine" : 1,
+        "resources" : {
+            "coin" : 1,
+            "key" : 0,
+            "secret" : 0
+        },
+        "skills" : [],
+        "skills_in_hand" : [],
+        "skills_played" : [],
+        "assistants" : ["1", "2", "3"],
+        "banned_assistant" : "0"
+    },
+
+    "1": {
+        "name" : "Junior Vlad",
+        "type" : "assistant",
+        "color" : "blue",
+        "current_possition" : "-1",
+        "quarantine" : 1,
+        "serves_to" : "-1",
+        "banned_by" : "0",
+        "donor" : 0,
+        "resource": "secret"
+    },
+
+    "2": {
+        "name" : "Mary",
+        "type" : "assistant",
+        "color" : "blue",
+        "current_possition" : "-1",
+        "quarantine" : 1,
+        "serves_to" : "-1",
+        "donor" : 0,
+        "resource": "coin"
+    },
+
+    "3": {
+        "name" : "Andrew",
+        "type" : "assistant",
+        "color" : "blue",
+        "current_possition" : "-1",
+        "quarantine" : 1,
+        "serves_to" : "-1",
+        "donor" : 0,
+        "resource": "key"
+    }
+}
