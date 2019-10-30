@@ -28,99 +28,8 @@ skills = read_json_data('data/skills.json')
 # TODO: create all strains
 strains = read_json_data('data/strains.json')
 
-game_map = {
-    '1' : {
-        'name': '',
-        'characters' : [],
-        'strains' : [],
-        'mission' : False,
-        },
-    '2' : {
-        'name': '',
-        'characters' : [],
-        'strains' : [],
-        'mission' : False,
-        },
-    '3' : {
-        'name': '',
-        'characters' : [],
-        'strains' : [],
-        'mission' : False,
-        },
-    '4' : {
-        'name': '',
-        'characters' : [],
-        'strains' : [],
-        'mission' : False,
-        },
-    '5' : {
-        'name': '',
-        'characters' : [],
-        'strains' : [],
-        'mission' : False,
-        },
-    '6' : {
-        'name': '',
-        'characters' : [],
-        'strains' : [],
-        'mission' : False,
-        },
-    '7' : {
-        'name': '',
-        'characters' : [],
-        'strains' : [],
-        'mission' : False,
-        },
-    '8' : {
-        'name': '',
-        'characters' : [],
-        'strains' : [],
-        'mission' : False,
-        },
-    '9' : {
-        'name': '',
-        'characters' : [],
-        'strains' : [],
-        'mission' : False,
-        },
-    '10' : {
-        'name': '',
-        'characters' : [],
-        'strains' : [],
-        'mission' : False,
-        },
-    '11' : {
-        'name': '',
-        'characters' : [],
-        'strains' : [],
-        'mission' : False,
-        },
-    '12' : {
-        'name': '',
-        'characters' : [],
-        'strains' : [],
-        'mission' : False,
-        },
-    '13' : {
-        'name': '',
-        'characters' : [],
-        'strains' : [],
-        'mission' : False,
-        },
-    '14' : {
-        'name': '',
-        'characters' : [],
-        'strains' : [],
-        'mission' : False,
-        },
-    '15' : {
-        'name': '',
-        'characters' : [],
-        'strains' : [],
-        'mission' : False,
-        },
-}
 
+game_map = read_json_data('data/game_map.json')
 
 
 def get_doctors():
@@ -164,12 +73,13 @@ def initial_placing():
     '''
 
     avaliable_assistants = {
-        'Bachelor' : ['-1', '1', '2', '3'],
-        'Haruspex' : ['-2', '4', '5', '6'],
-        'Devotress' : ['-3', '7', '8', '9'],
-    } # -X for doctors
+        'Bachelor': ['-1', '1', '2', '3'],
+        'Haruspex': ['-2', '4', '5', '6'],
+        'Devotress': ['-3', '7', '8', '9'],
+    }  # -X for doctors
 
-    avaliable_places = ['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15']
+    avaliable_places = ['1', '2', '3', '4', '5', '6',
+                        '7', '8', '9', '10', '11', '12', '13', '14', '15']
 
     doctors = [x[1] for x in characters.items() if '-' in x[0]]
     print(doctors)
@@ -189,7 +99,7 @@ def initial_placing():
                     break
                 else:
                     print('This character is already placed. Input another one.')
-            
+
             place = ''
             while 1:
                 print(f'Input place')
@@ -206,7 +116,7 @@ def initial_placing():
             avaliable_places.remove(place)
             avaliable_assistants[doctor_name].remove(character)
 
-    avaliable_places.append('0') # Plague can start in steepe
+    avaliable_places.append('0')  # Plague can start in steepe
     plague_place = ''
     print('\n' + '-' * 21)
     while 1:
@@ -219,7 +129,7 @@ def initial_placing():
             break
         else:
             print('This place is occupied. Input another one.')
-    
+
     place_character(plague_place, '0')
     print('Plague placed')
     print('-' * 21)
@@ -242,7 +152,7 @@ def move_to(character, place):
     # Update game map with new character possition
     game_map[place]['characters'].append(character)
     print(f'{character} moved from {current_possition} to {place}')
-  
+
 
 def move(character):
     '''
@@ -291,8 +201,10 @@ def pick_skill(character):
     character : str
         character id
     '''
-    doctors_skills = [x[0] for x in skills.items() if x[1]['doctor'] == character]
-    avaliable_skills = [x for x in doctors_skills if x not in characters[character]['skills_played']]
+    doctors_skills = [x[0]
+                      for x in skills.items() if x[1]['doctor'] == character]
+    avaliable_skills = [
+        x for x in doctors_skills if x not in characters[character]['skills_played']]
     doctor_name = characters[character]['name']
 
     print(f'Pick a skill for {doctor_name}')
@@ -306,23 +218,79 @@ def pick_skill(character):
             break
         else:
             print('Cant pick this skill')
-    
+
     characters[character]['skills_in_hand'].append(user_input)
     del skills[user_input]
 
 
 def get_strain_from_deck():
-    '''
-    TODO : implement this
+    ''' Pull random strain from deck.
+    TODO
     '''
     pass
 
 
 def get_strain_from_discard():
-    '''
-    TODO: implement this
+    ''' Draw strain from discard
+
+    TODO
     '''
     pass
+
+
+def player_doctor_turn(doctor):
+    ''' Perform turn for player who plays as doctor.
+
+    TODO
+
+    Player has two actions per turn by default. Some skills can bring it down to one.
+    Actions:
+        Play Action skill
+        Move character on the map
+    Each character has only one action per players turn.
+    Characters actions:
+        Move one or two cells
+        Get character out of quarantine
+        Complete mission
+        Pass resource from doctor to assistant
+        Get resource from bank by doctor
+        Collect resource from assistant
+
+    Parameters
+    ----------
+    doctor : str
+        doctor id
+    '''
+
+
+def unquarantine(character):
+    ''' Get character out of quarantine.
+
+    TODO
+
+    Parameters
+    ----------
+    character : str
+        character id
+    '''
+
+
+def collect_resourse_from_bank(resource):
+    '''
+    TODO
+    '''
+
+
+def collect_resourse_from_assistant(resource):
+    '''
+    TODO
+    '''
+
+
+def pass_resource_to_assistant(resource, assistant):
+    '''
+    TODO
+    '''
 
 
 def game_initiation():
@@ -336,6 +304,27 @@ def game_initiation():
         pick_skill(doc_id)
 
     get_strain_from_deck()
+
+
+class Game():
+    game_map = {}
+    missions_deck = {}
+    missions_discard = {}
+    strains_deck = {}
+    strains_discard = {}
+
+    def __init__(self):
+        self.game_map = read_json_data('data/game_map.json')
+
+    def draw_mission(self):
+        '''
+        TODO
+        '''
+
+    def complete_mission(self):
+        '''
+        TODO
+        '''
 
 
 game_initiation()
